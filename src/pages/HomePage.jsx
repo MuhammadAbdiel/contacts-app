@@ -2,26 +2,36 @@ import React, { Component } from "react";
 import { useSearchParams } from "react-router-dom";
 import ContactList from "../components/ContactList";
 import SearchBar from "../components/SearchBar";
-import { deleteContact, getContacts } from "../utils/data";
+import { getContacts, deleteContact } from "../utils/api";
 
 class HomePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      contacts: getContacts(),
+      contacts: [],
       keyword: props.defaultKeyword || "",
     };
     this.onDeleteHandler = this.onDeleteHandler.bind(this);
     this.onKeywordChangeHandler = this.onKeywordChangeHandler.bind(this);
   }
 
-  onDeleteHandler(id) {
-    deleteContact(id);
+  async componentDidMount() {
+    const { data } = await getContacts();
 
-    // update the contact state from data.js
     this.setState(() => {
       return {
-        contacts: getContacts(),
+        contacts: data,
+      };
+    });
+  }
+
+  async onDeleteHandler(id) {
+    await deleteContact(id);
+
+    const { data } = await getContacts();
+    this.setState(() => {
+      return {
+        contacts: data,
       };
     });
   }
